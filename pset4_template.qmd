@@ -43,13 +43,92 @@ Please refer to the minilesson on code style
 
 ## Download and explore the Provider of Services (POS) file (10 pts)
 
-1. 
+1. I put six variables: PRVDR_CTGRY_SBTYP_CD (subtype of provider), PRVDR_CTGRY_CD (type of provider), FAC_NAME (name of provider), PRVDR_NUM ( CMS Certification Number), PGM_TRMNTN_CD ( current termination status), ZIP_CD(zipcode).
+
 2. 
+```{python}
+import pandas as pd
+import os
+
+base_path="/Users/ruyuzhang/Desktop/PPHA 30538/problem-set-4-luyao-ruyu/dataset"
+path2016=os.path.join(base_path,"pos2016.csv")
+
+df_2016=pd.read_csv(path2016)
+
+import altair as alt
+alt.renderers.enable("png")
+import warnings 
+warnings.filterwarnings('ignore')
+```
+
     a.
+```{python}
+hospital_2016 = df_2016[(df_2016['PRVDR_CTGRY_CD'] == 1) & (df_2016['PRVDR_CTGRY_SBTYP_CD'] == 1)]
+hospital_count_2016 = hospital_2016.shape[0]
+hospital_count_2016
+ ```
+
+There are 7245 short-term hospitals reported in this data.
+
     b.
 3. 
+```{python}
+path2017=os.path.join(base_path,"pos2017.csv")
+df_2017=pd.read_csv(path2017,encoding="ISO-8859-1")
+
+path2018=os.path.join(base_path,"pos2018.csv")
+df_2018=pd.read_csv(path2018,encoding="ISO-8859-1")
+
+path2019=os.path.join(base_path,"pos2019.csv")
+df_2019=pd.read_csv(path2019,encoding="ISO-8859-1")
+
+hospital_2017 = df_2017[(df_2017['PRVDR_CTGRY_CD'] == 1) & (df_2017['PRVDR_CTGRY_SBTYP_CD'] == 1)]
+hospital_2017['Year'] = 2017
+hospital_2018 = df_2018[(df_2018['PRVDR_CTGRY_CD'] == 1) & (df_2018['PRVDR_CTGRY_SBTYP_CD'] == 1)]
+hospital_2018['Year'] = 2018
+hospital_2019 = df_2019[(df_2019['PRVDR_CTGRY_CD'] == 1) & (df_2019['PRVDR_CTGRY_SBTYP_CD'] == 1)]
+hospital_2019['Year'] = 2019
+hospital_2016['Year'] = 2016
+
+#append 4 datasets together
+hospital_all = pd.concat([hospital_2016, hospital_2017, hospital_2018, hospital_2019,], ignore_index=True)
+
+#Plot the number of observations by years
+year_all = hospital_all['Year'].value_counts().reset_index()
+year_all.columns = ['Year', 'Count']
+
+chart_all = alt.Chart(year_all).mark_bar().encode(
+    x=alt.X('Year:O', title='Year'),
+    y=alt.Y('Count:Q', title='Number of Observations',),
+    tooltip=['Year', 'Count']
+).properties(
+    title='Number of Observations by Years',
+    width=400,
+    height=250
+)
+chart_all
+```
+
 4. 
     a.
+```{python}
+#plot number of unique hospitals per year
+unique_hospitals = hospital_all.groupby('Year')['PRVDR_NUM'].nunique().reset_index()
+unique_hospitals.columns = ['Year', 'Unique_Hospitals']
+
+chart_unique = alt.Chart(unique_hospitals).mark_bar().encode(
+    x=alt.X('Year:O', title='Year'),
+    y=alt.Y('Unique_Hospitals:Q', title='Number of Unique Hospitals',),
+    tooltip=['Year', 'Unique_Hospitals']
+).properties(
+    title='Number of Unique Hospitals by Years',
+    width=400,
+    height=250
+)
+chart_unique
+```
+
+
     b.
 
 ## Identify hospital closures in POS file (15 pts) (*)
