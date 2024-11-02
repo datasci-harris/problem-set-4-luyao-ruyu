@@ -187,8 +187,20 @@ plt.show()
 ## Effects of closures on access in Texas (15 pts)
 
 1. 
+```{python}
+
+```
+
 2. 
+```{python}
+```
+
 3. 
+```{python}
+```
+
 4. 
+```{python}
+```
 
 ## Reflecting on the exercise (10 pts) 
