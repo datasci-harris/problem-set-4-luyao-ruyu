@@ -156,7 +156,19 @@ df_shp=gpd.read_file(pathshp)
 
 # Filter Texas zip codes that start with '75', '76', '77', '78', or '79'
 df_texas = df_shp[df_shp["ZCTA5"].str.startswith(('75', '76', '77', '78', '79'))]
-df_texas.head()
+hospital_zip = hospital_2016.groupby('ZIP_CD').size().reset_index(name='Hospital_Count')
+
+df_texas['ZCTA5'] = df_texas['ZCTA5'].astype(str)
+hospital_zip['ZIP_CD'] = hospital_zip['ZIP_CD'].astype(str).str.replace(r'\.0$', '', regex=True).str.zfill(5)
+
+map_texas = df_texas.merge(hospital_zip, left_on='ZCTA5', right_on='ZIP_CD', how='left')
+map_texas['Hospital_Count'] = map_texas['Hospital_Count'].fillna(0)
+
+import matplotlib.pyplot as plt
+map_texas.plot(column='Hospital_Count',legend=True)
+plt.title('Number of Hospitals per Zip Code in Texas (2016)', fontsize=12)
+plt.axis("off")
+plt.show()
 ```
 
 ## Calculate zip code’s distance to the nearest hospital (20 pts) (*)
